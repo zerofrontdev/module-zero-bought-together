@@ -36,7 +36,7 @@ class Picks
         $count = $this->config->count();
         $ids = self::order(
             $this->pairs->with((int) $product->getId(), $count * 3),
-            $this->config->fillWithRelated() ? array_map('intval', $product->getRelatedProductIds()) : [],
+            $this->config->fillWithRelated() ? $this->relatedIds($product) : [],
             (int) $product->getId()
         );
         if (!$ids) {
@@ -61,6 +61,23 @@ class Picks
      * @param int[] $ids
      * @return Product[] by id
      */
+    /**
+     * The related products' ids in their position order, from the link table
+     * alone: core's getRelatedProductIds() loads them as full products first.
+     *
+     * @return int[]
+     */
+    private function relatedIds(Product $product): array
+    {
+        $links = [];
+        foreach ($product->getRelatedLinkCollection() as $link) {
+            $links[] = ['id' => (int) $link->getLinkedProductId(), 'position' => (int) $link->getPosition()];
+        }
+        usort($links, static fn (array $a, array $b) => $a['position'] <=> $b['position']);
+
+        return array_column($links, 'id');
+    }
+
     public function load(array $ids): array
     {
         if (!$ids) {

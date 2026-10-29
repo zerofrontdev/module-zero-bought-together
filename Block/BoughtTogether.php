@@ -59,6 +59,28 @@ class BoughtTogether extends AbstractProduct implements IdentityInterface
     /**
      * @return int[] the ids the form adds as it first shows: the page's product (when pickable) and every pick
      */
+    /**
+     * The picked products themselves (the product and the picks that go into the
+     * cart as they are), for the summary: it needs no second load of them.
+     *
+     * @return array<int, Product> id => product
+     */
+    public function pickedProducts(): array
+    {
+        $products = [];
+        $product = $this->getProduct();
+        if ($product && $this->canPick($product)) {
+            $products[(int) $product->getId()] = $product;
+        }
+        foreach ($this->picks() as $pick) {
+            if ($this->canPick($pick)) {
+                $products[(int) $pick->getId()] = $pick;
+            }
+        }
+
+        return $products;
+    }
+
     public function pickedIds(): array
     {
         $ids = [];
@@ -107,9 +129,10 @@ class BoughtTogether extends AbstractProduct implements IdentityInterface
     {
         $product = $this->getProduct();
         $tags = $product ? [Pairs::tagOf((int) $product->getId())] : [];
-        // The picks' own pages' tags: their price or name changing refreshes this page.
+        // The picks' own tags: their price or name changing refreshes this page. Their own,
+        // not getIdentities(): that asks for each simple's configurable parents, a query each.
         foreach ($this->picks() as $pick) {
-            $tags = array_merge($tags, $pick->getIdentities());
+            $tags[] = Product::CACHE_TAG . '_' . (int) $pick->getId();
         }
 
         return $tags;

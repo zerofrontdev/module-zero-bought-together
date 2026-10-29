@@ -40,7 +40,10 @@ class Summary extends Template
     {
         $sum = 0.0;
         foreach ($this->products() as $product) {
-            $sum += (float) $product->getFinalPrice();
+            // The list's final price (the price index, with catalog rules) when the product came
+            // from a list; getFinalPrice() works it out again, a catalog rule query a product.
+            $price = $product->getData('final_price');
+            $sum += $price !== null ? (float) $price : (float) $product->getFinalPrice();
         }
 
         return $this->priceCurrency->convertAndFormat($sum, false);
@@ -53,7 +56,10 @@ class Summary extends Template
     {
         if ($this->products === null) {
             $ids = array_slice(array_values(array_unique(array_filter(array_map('intval', (array) $this->getData('ids'))))), 0, Cart::MAX);
-            $this->products = array_filter($this->picks->load($ids), static fn ($product) => $product->isSalable());
+            // On the product page the parent block hands its products over; the totals request loads them.
+            $given = $this->getData('products');
+            $products = is_array($given) ? array_intersect_key($given, array_flip($ids)) : $this->picks->load($ids);
+            $this->products = array_filter($products, static fn ($product) => $product->isSalable());
         }
 
         return $this->products;

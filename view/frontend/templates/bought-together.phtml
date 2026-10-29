@@ -19,6 +19,7 @@ if (!$picks || !$product) {
 $heading = $block->heading();
 $summary = $block->getChildBlock('summary');
 $summary?->setData('ids', $block->pickedIds());
+$summary?->setData('products', $block->pickedProducts());
 ?>
 <section class="bought-together" aria-labelledby="bought-together-heading" data-bought-together>
     <h2 class="bought-together-heading" id="bought-together-heading">
