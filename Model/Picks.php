@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Zero\BoughtTogether\Model;
 
+use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
@@ -24,7 +25,8 @@ class Picks
         private readonly Pairs $pairs,
         private readonly Config $config,
         private readonly CollectionFactory $collectionFactory,
-        private readonly Visibility $visibility
+        private readonly Visibility $visibility,
+        private readonly CatalogConfig $catalogConfig
     ) {
     }
 
@@ -88,6 +90,8 @@ class Picks
             ->addStoreFilter()
             ->setVisibility($this->visibility->getVisibleInSiteIds())
             ->addAttributeToSelect(['name', 'small_image', 'thumbnail', 'price', 'special_price', 'special_from_date', 'special_to_date', 'required_options', 'tax_class_id'])
+            // The listing attributes too: Zero_QuoteRequest's zero_quote_only (Block\BoughtTogether::canPick()).
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
             ->addIdFilter($ids)
             ->addMinimalPrice()
             ->addFinalPrice()

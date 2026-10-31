@@ -50,10 +50,12 @@ class BoughtTogether extends AbstractProduct implements IdentityInterface
 
     /**
      * Whether one of a product goes into the cart with no choice to make (else it links to its page).
+     * A Price on Request product (Zero_QuoteRequest's zero_quote_only) never does: the cart refuses it.
      */
     public function canPick(Product $product): bool
     {
-        return $product->isSalable() && !$product->isComposite() && !$product->getRequiredOptions();
+        return $product->isSalable() && !$product->isComposite() && !$product->getRequiredOptions()
+            && !$product->getData('zero_quote_only');
     }
 
     /**

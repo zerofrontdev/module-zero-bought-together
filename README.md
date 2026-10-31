@@ -42,8 +42,9 @@ with the product's related products when "Fill With Related Products" is
 on; only enabled, visible, in-stock products. A pick that goes into the
 cart as is (a simple product without required options) has a checkbox,
 checked; one with options to choose (a configurable, a bundle) links to
-its page instead. This product itself is included when it is such a
-product too.
+its page instead, and so does a Price on Request product
+(Zero_QuoteRequest's `zero_quote_only`, which the cart refuses). This
+product itself is included when it is such a product too.
 
 The summary (the total of the checked items at their catalog prices, the
 button) is an HTMX fragment: a change on the form refetches it with the
@@ -58,6 +59,8 @@ goes back to the product page (or to the cart, per Sales > Checkout >
 - `dev/tests/zero-e2e/tests/bought-together.spec.ts`: the section on a
   product page, the total after unchecking a pick, adding all to the cart.
   Skipped where the product has no picks.
+
+What changed in each release: [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

@@ -60,6 +60,8 @@ class Cart
             }
         }
         if ($added) {
+            // The mini cart and its count read the totals: collect them before saving.
+            $quote->setTotalsCollectedFlag(false)->collectTotals();
             $this->cartRepository->save($quote);
         }
 
